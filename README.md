@@ -33,7 +33,7 @@
 
 ```lua
 {
-  "Codesmith28/codesnap.nvim", -- or local dir = "~/Projects/codesnap.nvim"
+  "Codesmith28/CodeSnappier.nvim", -- or local dir = "~/Projects/CodeSnappier.nvim" (or "~/Projects/codesnap.nvim")
   build = "make build_generator",
   cmd = { "CodeSnappier", "CodeSnappierSave", "CodeSnap", "CodeSnapSave" },
   keys = {
@@ -49,8 +49,8 @@
 ### Build from source (manual)
 
 ```bash
-git clone https://github.com/Codesmith28/codesnap.nvim.git ~/.local/share/nvim/lazy/codesnap.nvim
-cd ~/.local/share/nvim/lazy/codesnap.nvim
+git clone https://github.com/Codesmith28/CodeSnappier.nvim.git ~/.local/share/nvim/lazy/CodeSnappier.nvim
+cd ~/.local/share/nvim/lazy/CodeSnappier.nvim
 make build_generator
 ```
 
