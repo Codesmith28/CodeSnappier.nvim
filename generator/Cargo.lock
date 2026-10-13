@@ -738,6 +738,7 @@ dependencies = [
 name = "generator"
 version = "0.1.0"
 dependencies = [
+ "arboard",
  "codesnap",
  "mlua",
  "openssl",

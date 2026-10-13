@@ -13,6 +13,7 @@ serde = { version = "1.0.204", features = ["derive"] }
 tokio = { version = "1.44.2", features = ["rt", "rt-multi-thread"] }
 # Use system OpenSSL
 openssl = { version = "0.10" }
+arboard = { version = "3.6", default-features = false, features = ["image-data"] }
 
 [profile.release]
 opt-level = 3

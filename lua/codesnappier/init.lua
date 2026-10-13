@@ -42,13 +42,48 @@ function main.save(save_path, detail)
   vim.notify("Save snapshot in " .. resolved_path .. " successfully", vim.log.levels.INFO)
 end
 
+--- Fast non-blocking clipboard copy for generated image snapshots
+--- @param config table
+local function copy_snapshot_image(config)
+  if vim.fn.has("linux") == 1 and generator.get_png_bytes then
+    local is_wayland = (vim.env.WAYLAND_DISPLAY ~= nil and vim.env.WAYLAND_DISPLAY ~= "")
+      or (vim.env.WAYLAND_SOCKET ~= nil and vim.env.WAYLAND_SOCKET ~= "")
+    local is_x11 = (vim.env.DISPLAY ~= nil and vim.env.DISPLAY ~= "")
+
+    if is_wayland and vim.fn.executable("wl-copy") == 1 then
+      local ok, bytes = pcall(generator.get_png_bytes, config)
+      if ok and bytes and #bytes > 0 then
+        local job = vim.fn.jobstart({ "wl-copy", "--type", "image/png" }, { detach = true })
+        if job > 0 then
+          vim.fn.jobsend(job, bytes)
+          vim.fn.jobclose(job, "stdin")
+          return
+        end
+      end
+    elseif is_x11 and vim.fn.executable("xclip") == 1 then
+      local ok, bytes = pcall(generator.get_png_bytes, config)
+      if ok and bytes and #bytes > 0 then
+        local job = vim.fn.jobstart({ "xclip", "-selection", "clipboard", "-target", "image/png" }, { detach = true })
+        if job > 0 then
+          vim.fn.jobsend(job, bytes)
+          vim.fn.jobclose(job, "stdin")
+          return
+        end
+      end
+    end
+  end
+
+  -- Native generator copy (macOS NSPasteboard, Windows Win32 clipboard, or Linux arboard fallback)
+  generator.copy(config)
+end
+
 -- Copy snapshot into clipboard
 --- @param detail_or_path any
 --- @param maybe_detail table|nil
 function main.copy(detail_or_path, maybe_detail)
   local detail = type(detail_or_path) == "table" and detail_or_path or (type(maybe_detail) == "table" and maybe_detail or nil)
   local config = config_module.get_config(detail)
-  generator.copy(config)
+  copy_snapshot_image(config)
   pcall(vim.cmd, "delmarks <>")
   vim.notify("The snapshot is copied into clipboard successfully!", vim.log.levels.INFO)
 end
@@ -104,7 +139,7 @@ function main.copy_highlight(detail_or_path, maybe_detail)
       { start_line, end_line, static.config.highlight_color },
     }
 
-    generator.copy(config)
+    copy_snapshot_image(config)
     pcall(vim.cmd, "delmarks <>")
     vim.notify("The snapshot is copied into clipboard successfully!", vim.log.levels.INFO)
   end)
