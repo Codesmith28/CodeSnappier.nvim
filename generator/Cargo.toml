@@ -11,6 +11,13 @@ codesnap = { version = "0.13.4", features = ["full"] }
 mlua = { version = "0.10.0", features = ["module", "luajit", "serialize"] }
 serde = { version = "1.0.204", features = ["derive"] }
 tokio = { version = "1.44.2", features = ["rt", "rt-multi-thread"] }
-# Force vendored OpenSSL for cross-compilation
-openssl = { version = "0.10", features = ["vendored"] }
+# Use system OpenSSL
+openssl = { version = "0.10" }
+
+[profile.release]
+opt-level = 3
+lto = "thin"
+codegen-units = 1
+panic = "abort"
+strip = true
 

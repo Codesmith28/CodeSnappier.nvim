@@ -102,6 +102,11 @@ fn copy_ascii(_: &Lua, config: SnapshotConfigLua) -> LuaResult<()> {
 }
 
 fn parse_code_theme(_: &Lua, code_theme: String) -> LuaResult<String> {
+    // If it's a local theme, return immediately without spinning up a Tokio runtime
+    if !code_theme.contains("://") && !code_theme.contains('@') {
+        return Ok(code_theme);
+    }
+
     let rt = tokio::runtime::Runtime::new()
         .map_err(|e| mlua::Error::RuntimeError(format!("Failed to create Tokio runtime: {}", e)))?;
 
