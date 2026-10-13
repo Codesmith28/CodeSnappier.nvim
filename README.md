@@ -37,6 +37,14 @@ CodeSnappier is engineered to eliminate UI blocking and deliver near-instantaneo
 | **Save to Disk** (`:CodeSnappierSave`) | ~180 ms | **~42 ms** | **~4.3x faster** |
 | **Clipboard Delivery** | ~1,185 ms (blocking) | **~1.5 ms** (detached) | **~790x faster** |
 
+### Why is it faster?
+
+- **Eliminated 1-Second Clipboard Sleep**: Removed an unconditional 1,000 ms block from upstream that froze Neovim's main thread on every copy.
+- **Direct In-Memory PNG Streaming**: Bypassed intermediate RGBA conversions, piping pre-encoded PNG bytes directly from native memory.
+- **Detached Asynchronous Delivery**: Offloaded clipboard handoff to background processes (`wl-copy` on Wayland, `xclip` on X11, native pasteboard on macOS/Windows) so Neovim never waits on external display servers.
+- **Zero Tokio Overhead**: Local themes and highlight syntax are evaluated directly in-process instead of spawning and blocking on a full multi-threaded Tokio runtime.
+- **Compiler-Level Optimization**: Compiled with Rust `opt-level = 3`, Thin LTO (Link-Time Optimization), single codegen unit, and symbol stripping.
+
 ---
 
 ## 📦 Installation
