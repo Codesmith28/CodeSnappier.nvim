@@ -35,7 +35,7 @@ local function get_platform_lib_name()
 end
 
 local function get_plugin_version()
-  local path_utils = require("codesnap.utils.path")
+  local path_utils = require("codesnappier.utils.path")
   local sep = path_utils.get_separator()
   local project_toml_path =
     path_utils.join(sep, vim.fn.fnamemodify(debug.getinfo(1).source:sub(2), ":p:h:h:h"), "project.toml")
@@ -54,7 +54,7 @@ end
 
 local function download_lib(version, lib_name, dest_path)
   local url = string.format("https://github.com/mistricky/codesnap.nvim/releases/download/v%s/%s", version, lib_name)
-  local platform_utils = require("codesnap.utils.platform")
+  local platform_utils = require("codesnappier.utils.platform")
 
   local cmd
   if platform_utils.is_windows() then
@@ -79,7 +79,7 @@ local function download_lib(version, lib_name, dest_path)
 end
 
 function fetch.ensure_lib()
-  local path_utils = require("codesnap.utils.path")
+  local path_utils = require("codesnappier.utils.path")
   local lib_name = get_platform_lib_name()
   local version = get_plugin_version()
 

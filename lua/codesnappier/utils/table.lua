@@ -1,4 +1,4 @@
-local list_utils = require("codesnap.utils.list")
+local list_utils = require("codesnappier.utils.list")
 local table_utils = {}
 
 function table_utils.assign(t, props)

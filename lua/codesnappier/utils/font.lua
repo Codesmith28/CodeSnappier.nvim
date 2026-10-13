@@ -1,4 +1,4 @@
-local platform_utils = require("codesnap.utils.platform")
+local platform_utils = require("codesnappier.utils.platform")
 
 local font_utils = {
   _cached_font = nil,

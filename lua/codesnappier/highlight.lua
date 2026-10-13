@@ -1,11 +1,11 @@
-local string_utils = require("codesnap.utils.string")
-local table_utils = require("codesnap.utils.table")
+local string_utils = require("codesnappier.utils.string")
+local table_utils = require("codesnappier.utils.table")
 local highlight_module = {}
 
 function highlight_module.call_cb_with_parsed_config(cb_name, highlight_start_line_number, highlight_end_line_number)
   vim.api.nvim_buf_delete(0, {})
   vim.schedule(function()
-    local main = require("codesnap")
+    local main = require("codesnappier")
     local config = table_utils.merge(main.highlight_mode_config, {
       highlight_start_line_number = highlight_start_line_number,
       highlight_end_line_number = highlight_end_line_number,
@@ -43,9 +43,9 @@ function highlight_module.create_highlight_selector_window(cb_name, code)
   vim.keymap.set(
     { "v", "n" },
     "<CR>",
-    ":lua require('codesnap.highlight').call_cb_with_parsed_config('"
+    ":lua require('codesnappier.highlight').call_cb_with_parsed_config('"
       .. cb_name
-      .. "', require('codesnap.utils.visual').get_start_line_number(), require('codesnap.utils.visual').get_end_line_number())<CR>",
+      .. "', require('codesnappier.utils.visual').get_start_line_number(), require('codesnappier.utils.visual').get_end_line_number())<CR>",
     { silent = true, buffer = bufnr }
   )
 

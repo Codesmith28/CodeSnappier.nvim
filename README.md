@@ -1,7 +1,7 @@
-<h1 align="center">CodeSnap.nvim</h1>
+<h1 align="center">CodeSnappier.nvim</h1>
 
 <p align="center">
-  <b>Fast, beautiful code snapshots for Neovim.</b><br>
+  <b>Fast, beautiful code snapshots for Neovim — noticeably snappier.</b><br>
   Matches your active Neovim colorscheme, system font, and generates transparent screenshots.
 </p>
 
@@ -33,12 +33,12 @@
 
 ```lua
 {
-  "Codesmith28/codesnap.nvim",
+  "Codesmith28/codesnap.nvim", -- or local dir = "~/Projects/codesnap.nvim"
   build = "make build_generator",
-  cmd = { "CodeSnap", "CodeSnapSave", "CodeSnapASCII", "CodeSnapHighlight" },
+  cmd = { "CodeSnappier", "CodeSnappierSave", "CodeSnap", "CodeSnapSave" },
   keys = {
-    { "<leader>Cc", "<cmd>CodeSnap<cr>", mode = "x", desc = "Copy snapshot to clipboard" },
-    { "<leader>Cs", "<cmd>CodeSnapSave<cr>", mode = "x", desc = "Save snapshot to file" },
+    { "<leader>Cc", "<cmd>CodeSnappier<cr>", mode = "x", desc = "Copy snapshot to clipboard" },
+    { "<leader>Cs", "<cmd>CodeSnappierSave<cr>", mode = "x", desc = "Save snapshot to file" },
   },
   opts = {
     save_path = "~/Pictures/Screenshots",
@@ -58,21 +58,21 @@ make build_generator
 
 ## ⌨️ Commands & Keymaps
 
-| Command | Keymap (Visual Mode) | Description |
-| :--- | :--- | :--- |
-| `:CodeSnap` | `<leader>Cc` | Copies snapshot to system clipboard as transparent PNG (`image/png`). |
-| `:CodeSnapSave [path]` | `<leader>Cs` | Saves snapshot to disk (defaults to system screenshot folder with timestamp). |
-| `:CodeSnapHighlight` | — | Interactively select lines to highlight before copying. |
-| `:CodeSnapASCII` | — | Copies snapshot as ASCII art text box. |
+| Command | Alias | Keymap (Visual) | Description |
+| :--- | :--- | :--- | :--- |
+| `:CodeSnappier` | `:CodeSnap` | `<leader>Cc` | Copies snapshot to clipboard as transparent PNG (`image/png`). |
+| `:CodeSnappierSave [path]` | `:CodeSnapSave` | `<leader>Cs` | Saves snapshot to disk (defaults to system screenshot folder). |
+| `:CodeSnappierHighlight` | `:CodeSnapHighlight` | — | Interactively select lines to highlight before copying. |
+| `:CodeSnappierASCII` | `:CodeSnapASCII` | — | Copies snapshot as ASCII art text box. |
 
 ---
 
 ## ⚙️ Configuration
 
-CodeSnap works out of the box with zero configuration. You can customize any option in `setup()`:
+CodeSnappier works out of the box with zero configuration. You can customize any option in `setup()`:
 
 ```lua
-require("codesnap").setup({
+require("codesnappier").setup({
   -- Font family to use for code, title bar, and breadcrumbs.
   -- Defaults to nil / "auto", which resolves via prioritized fallback:
   --   p0 = terminal font (Ghostty, Kitty, Alacritty, WezTerm, iTerm2, or GUI guifont)

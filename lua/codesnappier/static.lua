@@ -1,5 +1,5 @@
-local font_utils = require("codesnap.utils.font")
-local path_utils = require("codesnap.utils.path")
+local font_utils = require("codesnappier.utils.font")
+local path_utils = require("codesnappier.utils.path")
 
 local detected_font = font_utils.get_font()
 

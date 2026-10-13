@@ -1,5 +1,5 @@
 {
-  description = "CodeSnap.nvim - pretty code snapshots for Neovim";
+  description = "CodeSnappier.nvim - fast, pretty code snapshots for Neovim";
 
   inputs = {
     nixpkgs.url = "github:NixOS/nixpkgs/nixos-unstable";
@@ -128,10 +128,11 @@
           export HOME=$TMPDIR
           nvim --headless --clean \
             --cmd "set runtimepath^=${plugin}" \
+            -c "lua require('codesnappier').setup({})" \
+            -c "lua assert(require('codesnappier.module').load_generator() ~= nil, 'generator failed to load')" \
             -c "lua require('codesnap').setup({})" \
-            -c "lua assert(require('codesnap.module').load_generator() ~= nil, 'generator failed to load')" \
             -c "qa!" 2> $TMPDIR/err || (cat $TMPDIR/err; exit 1)
-          echo "codesnap.nvim loaded and generator module resolved" > $out
+          echo "codesnappier.nvim loaded and generator module resolved" > $out
         '';
     });
 

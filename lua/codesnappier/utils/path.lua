@@ -1,5 +1,5 @@
-local string_utils = require("codesnap.utils.string")
-local platform_utils = require("codesnap.utils.platform")
+local string_utils = require("codesnappier.utils.string")
+local platform_utils = require("codesnappier.utils.platform")
 local path_utils = {}
 
 -- Get the appropriate path separator for the current OS
@@ -174,12 +174,12 @@ function path_utils.generate_snapshot_filename()
   end
   buf_name = buf_name:gsub("[/\\]", "_")
   local timestamp = os.date("%Y-%m-%d_%H-%M-%S")
-  return string.format("codesnap_%s_%s.png", buf_name, timestamp)
+  return string.format("codesnappier_%s_%s.png", buf_name, timestamp)
 end
 
 function path_utils.resolve_save_path(save_path)
   if not save_path or save_path == "" then
-    local ok, static = pcall(require, "codesnap.static")
+    local ok, static = pcall(require, "codesnappier.static")
     local configured_path = ok and static and (static.config and static.config.save_path or (static.config and static.config.snapshot_config and static.config.snapshot_config.save_path))
     save_path = configured_path or path_utils.get_default_save_path()
   end

@@ -1,10 +1,10 @@
-local static = require("codesnap.static")
-local table_utils = require("codesnap.utils.table")
-local module = require("codesnap.module")
-local config_module = require("codesnap.config")
-local modal = require("codesnap.modal")
-local path = require("codesnap.path")
-local path_utils = require("codesnap.utils.path")
+local static = require("codesnappier.static")
+local table_utils = require("codesnappier.utils.table")
+local module = require("codesnappier.module")
+local config_module = require("codesnappier.config")
+local modal = require("codesnappier.modal")
+local path = require("codesnappier.path")
+local path_utils = require("codesnappier.utils.path")
 
 -- Prepare the Rust generator module
 local generator = module.load_generator()

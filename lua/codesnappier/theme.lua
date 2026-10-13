@@ -62,7 +62,7 @@ function theme.extract()
   local diff_add_hex = to_hex(diff_add.bg) or to_hex(diff_add.fg) or "#a6e3a1"
   local diff_delete_hex = to_hex(diff_delete.bg) or to_hex(diff_delete.fg) or "#f38ba8"
 
-  local theme_dir = vim.fn.stdpath("cache") .. "/codesnap"
+  local theme_dir = vim.fn.stdpath("cache") .. "/codesnappier"
   vim.fn.mkdir(theme_dir, "p")
   local theme_file = theme_dir .. "/nvim_theme.tmTheme"
 

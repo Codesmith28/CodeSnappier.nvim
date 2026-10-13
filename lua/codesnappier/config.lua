@@ -1,11 +1,11 @@
-local visual_utils = require("codesnap.utils.visual")
-local path_utils = require("codesnap.utils.path")
-local string_utils = require("codesnap.utils.string")
-local static = require("codesnap.static")
-local table_utils = require("codesnap.utils.table")
-local module = require("codesnap.module")
-local theme_module = require("codesnap.theme")
-local font_utils = require("codesnap.utils.font")
+local visual_utils = require("codesnappier.utils.visual")
+local path_utils = require("codesnappier.utils.path")
+local string_utils = require("codesnappier.utils.string")
+local static = require("codesnappier.static")
+local table_utils = require("codesnappier.utils.table")
+local module = require("codesnappier.module")
+local theme_module = require("codesnappier.theme")
+local font_utils = require("codesnappier.utils.font")
 
 local config_module = {}
 

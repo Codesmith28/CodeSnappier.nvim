@@ -2,9 +2,9 @@ local module = {
   generator = nil,
 }
 
-local path_utils = require("codesnap.utils.path")
-local fetch = require("codesnap.fetch")
-local platform = require("codesnap.utils.platform")
+local path_utils = require("codesnappier.utils.path")
+local fetch = require("codesnappier.fetch")
+local platform = require("codesnappier.utils.platform")
 
 local OS_LIB_EXTENSION_MAP = {
   mac = "dylib",
