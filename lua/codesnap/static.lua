@@ -5,6 +5,7 @@ local detected_font = font_utils.get_font()
 
 return {
   config = {
+    font_family = nil, -- Optional explicit font. When nil/auto, follows p0 (terminal) -> p1 (system) -> p2 (fallback)
     show_line_number = true,
     diff_config = {
       add_color = "#98C37960",

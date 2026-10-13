@@ -180,8 +180,12 @@ local function detect_terminal_font()
   return nil
 end
 
+--- Detect font following the prioritized fallback ladder:
+--- p0: Terminal font (GUI guifont or terminal emulator: Ghostty, Kitty, Alacritty, WezTerm, iTerm2)
+--- p1: System monospace font (fontconfig fc-match on Linux, macOS defaults, Windows system fonts)
+--- p2: Generic fallback monospace font ("monospace")
 function font_utils.detect_font()
-  -- 1. Check vim.o.guifont if running in a GUI
+  -- p0: Terminal font (GUI guifont or terminal emulator configuration)
   local is_gui = (vim.fn.has("gui_running") == 1) or vim.g.neovide or vim.g.goneovim
   if is_gui and vim.o.guifont and vim.o.guifont ~= "" then
     local cleaned = clean_font_name(vim.o.guifont)
@@ -190,13 +194,12 @@ function font_utils.detect_font()
     end
   end
 
-  -- 2. Detect directly from terminal emulator configuration (Ghostty, Kitty, Alacritty, WezTerm, iTerm2)
   local term_font = detect_terminal_font()
   if term_font and term_font ~= "" then
     return term_font
   end
 
-  -- 2. Detect by OS
+  -- p1: System monospace font
   local detected = nil
   if platform_utils.is_linux() then
     detected = detect_linux_font()
@@ -210,6 +213,7 @@ function font_utils.detect_font()
     return detected
   end
 
+  -- p2: Whatever fallback monospace font is available
   return "monospace"
 end
 

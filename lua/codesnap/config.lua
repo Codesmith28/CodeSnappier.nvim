@@ -118,27 +118,36 @@ function config_module.get_config(detail)
     title = (buf_name and buf_name ~= "") and buf_name or "code"
   end
 
-  -- Ensure detected system font is applied to all components
-  local detected_font = font_utils.get_font()
+  -- Resolve font: User explicit config -> p0 (terminal) -> p1 (system) -> p2 (fallback)
+  local explicit_font = static.config.font_family
+    or (static.config.snapshot_config and static.config.snapshot_config.font_family)
+    or (static.config.snapshot_config and static.config.snapshot_config.code_config and static.config.snapshot_config.code_config.font_family)
+
+  local resolved_font
+  if explicit_font and explicit_font ~= "" and explicit_font ~= "auto" then
+    resolved_font = explicit_font
+  else
+    resolved_font = font_utils.get_font()
+  end
 
   local snapshot_config = vim.deepcopy(static.config.snapshot_config)
   snapshot_config.title = title
 
-  -- Apply detected font to components if not explicitly customized
+  -- Apply resolved font to components if not explicitly customized
   if snapshot_config.window and snapshot_config.window.title_config then
-    snapshot_config.window.title_config.font_family = snapshot_config.window.title_config.font_family or detected_font
+    snapshot_config.window.title_config.font_family = snapshot_config.window.title_config.font_family or resolved_font
   end
   if snapshot_config.code_config then
-    snapshot_config.code_config.font_family = snapshot_config.code_config.font_family or detected_font
+    snapshot_config.code_config.font_family = resolved_font
     if snapshot_config.code_config.breadcrumbs then
-      snapshot_config.code_config.breadcrumbs.font_family = snapshot_config.code_config.breadcrumbs.font_family or detected_font
+      snapshot_config.code_config.breadcrumbs.font_family = snapshot_config.code_config.breadcrumbs.font_family or resolved_font
     end
   end
   if snapshot_config.command_output_config then
-    snapshot_config.command_output_config.font_family = snapshot_config.command_output_config.font_family or detected_font
+    snapshot_config.command_output_config.font_family = snapshot_config.command_output_config.font_family or resolved_font
   end
   if snapshot_config.watermark then
-    snapshot_config.watermark.font_family = snapshot_config.watermark.font_family or detected_font
+    snapshot_config.watermark.font_family = snapshot_config.watermark.font_family or resolved_font
   end
 
   -- Line number color default from theme

@@ -73,6 +73,14 @@ CodeSnap works out of the box with zero configuration. You can customize any opt
 
 ```lua
 require("codesnap").setup({
+  -- Font family to use for code, title bar, and breadcrumbs.
+  -- Defaults to nil / "auto", which resolves via prioritized fallback:
+  --   p0 = terminal font (Ghostty, Kitty, Alacritty, WezTerm, iTerm2, or GUI guifont)
+  --   p1 = system monospace font (fontconfig fc-match on Linux, macOS/Windows system defaults)
+  --   p2 = generic fallback monospace font ("monospace")
+  -- Or set an explicit font name: font_family = "Fira Code"
+  font_family = nil,
+
   -- Destination directory or file path for :CodeSnapSave
   -- Defaults to your system screenshot folder (~/Pictures/Screenshots)
   save_path = nil,
