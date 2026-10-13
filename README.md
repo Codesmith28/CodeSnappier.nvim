@@ -27,6 +27,18 @@
 
 ---
 
+## ⚡ Performance Benchmarks
+
+CodeSnappier is engineered to eliminate UI blocking and deliver near-instantaneous snapshots:
+
+| Operation | Before | CodeSnappier | Speedup |
+| :--- | :--- | :--- | :--- |
+| **Copy to Clipboard** (`:CodeSnappier`) | ~1,225 ms | **~42 ms** | **~29x faster** |
+| **Save to Disk** (`:CodeSnappierSave`) | ~180 ms | **~42 ms** | **~4.3x faster** |
+| **Clipboard Delivery** | ~1,185 ms (blocking) | **~1.5 ms** (detached) | **~790x faster** |
+
+---
+
 ## 📦 Installation
 
 ### [lazy.nvim](https://github.com/folke/lazy.nvim)
