@@ -20,4 +20,7 @@ node_modules
 # build
 output.css
 *.so
+!lua/*-aarch64*generator.so
+!lua/*-x86_64*generator.so
+lua/generator.so
 lua/libs

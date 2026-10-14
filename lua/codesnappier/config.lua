@@ -168,6 +168,19 @@ function config_module.get_config(detail)
     table.insert(snapshot_config.themes_folders, theme_info.theme_dir)
   end
 
+  -- Automatically populate default OS font folders for fontdb font resolution
+  snapshot_config.fonts_folders = snapshot_config.fonts_folders or {}
+  local default_fonts = font_utils.get_default_fonts_folders()
+  local existing_font_dirs = {}
+  for _, folder in ipairs(snapshot_config.fonts_folders) do
+    existing_font_dirs[folder] = true
+  end
+  for _, folder in ipairs(default_fonts) do
+    if not existing_font_dirs[folder] then
+      table.insert(snapshot_config.fonts_folders, folder)
+    end
+  end
+
   local theme_name = snapshot_config.theme
   if theme_name:match("://") or theme_name:match("@") then
     theme_name = module.load_generator().parse_code_theme(theme_name)

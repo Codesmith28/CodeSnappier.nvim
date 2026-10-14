@@ -16,3 +16,7 @@ if [[ $1 =~ "release" ]]; then
 fi
 
 cp -rf ./generator/target/$target/libgenerator.$lib_suffix lua/generator.so
+
+if [ -n "$os" ] && [ "$os" != "Unknown" ]; then
+  cp -rf ./generator/target/$target/libgenerator.$lib_suffix lua/"${os}generator.so"
+fi

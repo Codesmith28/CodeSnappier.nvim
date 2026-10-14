@@ -740,7 +740,9 @@ version = "0.1.0"
 dependencies = [
  "arboard",
  "codesnap",
+ "cosmic-text",
  "mlua",
+ "objc2",
  "openssl",
  "serde",
  "tokio",

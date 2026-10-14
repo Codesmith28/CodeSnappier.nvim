@@ -33,8 +33,29 @@ local function detect_linux_font()
   return nil
 end
 
+local function normalize_font_name(font)
+  if not font or font == "" then
+    return nil
+  end
+  local trimmed = vim.trim(font)
+  if trimmed:lower() == "monospace" then
+    return nil
+  end
+
+  -- Auto-title-case font names if lowercase (e.g. "lilex nerd font" -> "Lilex Nerd Font")
+  local words = vim.split(trimmed, "%s+")
+  local capitalized = {}
+  for _, w in ipairs(words) do
+    if w ~= "" then
+      table.insert(capitalized, w:sub(1, 1):upper() .. w:sub(2))
+    end
+  end
+  local title_cased = table.concat(capitalized, " ")
+  return title_cased ~= "" and title_cased or trimmed
+end
+
 local function detect_macos_font()
-  local common_fonts = { "SF Mono", "Menlo", "Monaco", "monospace" }
+  local common_fonts = { "SF Mono", "Menlo", "Monaco" }
   local mac_font_paths = {
     ["SF Mono"] = {
       "/System/Applications/Utilities/Terminal.app/Contents/Resources/Fonts/SF-Mono-Regular.otf",
@@ -50,13 +71,11 @@ local function detect_macos_font()
       "/System/Library/Fonts/Monaco.dfont",
       "/Library/Fonts/Monaco.dfont",
       "/System/Library/Fonts/Supplemental/Monaco.dfont",
+      "/System/Library/Fonts/Monaco.ttf",
     },
   }
 
   for _, font_name in ipairs(common_fonts) do
-    if font_name == "monospace" then
-      return "monospace"
-    end
     local paths = mac_font_paths[font_name]
     if paths then
       for _, p in ipairs(paths) do
@@ -67,7 +86,7 @@ local function detect_macos_font()
     end
   end
 
-  return "SF Mono"
+  return "Menlo"
 end
 
 local function detect_windows_font()
@@ -99,7 +118,7 @@ local function detect_terminal_font()
             local font = line:match("^%s*font%-family%s*=%s*[\"']?([^\"'\r\n]+)[\"']?")
             if font and font ~= "" and font:lower() ~= "monospace" then
               f:close()
-              return vim.trim(font)
+              return normalize_font_name(font)
             end
           end
           f:close()
@@ -118,7 +137,7 @@ local function detect_terminal_font()
           local font = line:match("^%s*font_family%s+[\"']?([^\"'\r\n]+)[\"']?")
           if font and font ~= "" and font:lower() ~= "monospace" then
             f:close()
-            return vim.trim(font)
+            return normalize_font_name(font)
           end
         end
         f:close()
@@ -141,7 +160,7 @@ local function detect_terminal_font()
             or line:match('family:%s*["\']?([^"\'\r\n]+)["\']?')
           if font and font ~= "" and font:lower() ~= "monospace" then
             f:close()
-            return vim.trim(font)
+            return normalize_font_name(font)
           end
         end
         f:close()
@@ -160,7 +179,7 @@ local function detect_terminal_font()
         local font = content:match('font%s*=%s*wezterm%.font%s*%(%s*["\']([^"\']+)["\']')
           or content:match('font%s*=%s*wezterm%.font_with_fallback%s*%({?%s*["\']([^"\']+)["\']')
         if font and font ~= "" and font:lower() ~= "monospace" then
-          return vim.trim(font)
+          return normalize_font_name(font)
         end
       end
     end
@@ -172,7 +191,7 @@ local function detect_terminal_font()
     if ok and vim.v.shell_error == 0 and out then
       local font = clean_font_name(out)
       if font and font ~= "" then
-        return font
+        return normalize_font_name(font)
       end
     end
   end
@@ -180,17 +199,65 @@ local function detect_terminal_font()
   return nil
 end
 
+--- Get all standard OS font directories
+function font_utils.get_default_fonts_folders()
+  local dirs = {}
+  local home = vim.fn.expand("~")
+
+  if platform_utils.is_macos() then
+    local candidates = {
+      home .. "/Library/Fonts",
+      "/Library/Fonts",
+      "/System/Library/Fonts",
+      "/System/Library/Fonts/Supplemental",
+      "/System/Applications/Utilities/Terminal.app/Contents/Resources/Fonts",
+      "/Applications/Xcode.app/Contents/SharedFrameworks/DVTKit.framework/Resources/Fonts",
+    }
+    for _, dir in ipairs(candidates) do
+      if vim.fn.isdirectory(dir) == 1 then
+        table.insert(dirs, dir)
+      end
+    end
+  elseif platform_utils.is_linux() then
+    local candidates = {
+      home .. "/.local/share/fonts",
+      home .. "/.fonts",
+      "/usr/share/fonts",
+      "/usr/local/share/fonts",
+    }
+    for _, dir in ipairs(candidates) do
+      if vim.fn.isdirectory(dir) == 1 then
+        table.insert(dirs, dir)
+      end
+    end
+  elseif platform_utils.is_windows() then
+    local windir = os.getenv("WINDIR") or "C:\\Windows"
+    local local_app_data = os.getenv("LOCALAPPDATA")
+    local candidates = {
+      windir .. "\\Fonts",
+      local_app_data and (local_app_data .. "\\Microsoft\\Windows\\Fonts") or nil,
+    }
+    for _, dir in ipairs(candidates) do
+      if dir and vim.fn.isdirectory(dir) == 1 then
+        table.insert(dirs, dir)
+      end
+    end
+  end
+
+  return dirs
+end
+
 --- Detect font following the prioritized fallback ladder:
 --- p0: Terminal font (GUI guifont or terminal emulator: Ghostty, Kitty, Alacritty, WezTerm, iTerm2)
 --- p1: System monospace font (fontconfig fc-match on Linux, macOS defaults, Windows system fonts)
---- p2: Generic fallback monospace font ("monospace")
+--- p2: Generic fallback monospace font ("Menlo" on macOS, "Consolas" on Windows, "monospace" on Linux)
 function font_utils.detect_font()
   -- p0: Terminal font (GUI guifont or terminal emulator configuration)
   local is_gui = (vim.fn.has("gui_running") == 1) or vim.g.neovide or vim.g.goneovim
   if is_gui and vim.o.guifont and vim.o.guifont ~= "" then
     local cleaned = clean_font_name(vim.o.guifont)
     if cleaned then
-      return cleaned
+      return normalize_font_name(cleaned)
     end
   end
 
@@ -213,7 +280,12 @@ function font_utils.detect_font()
     return detected
   end
 
-  -- p2: Whatever fallback monospace font is available
+  -- p2: Robust OS-specific monospace fallback (never generic proportional "monospace")
+  if platform_utils.is_macos() then
+    return "Menlo"
+  elseif platform_utils.is_windows() then
+    return "Consolas"
+  end
   return "monospace"
 end
 

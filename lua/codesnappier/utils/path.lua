@@ -197,8 +197,17 @@ function path_utils.resolve_save_path(save_path)
   end
 
   local ext = vim.fn.fnamemodify(expanded, ":e"):lower()
-  if ext == "png" or ext == "svg" or ext == "html" then
+  if ext == "png" then
     return expanded
+  elseif ext ~= "" then
+    -- Non-png extensions (.tiff, .svg, .html, etc.) are strictly replaced with .png
+    local without_ext = vim.fn.fnamemodify(expanded, ":r")
+    return without_ext .. ".png"
+  end
+
+  local parent = vim.fs.dirname(expanded)
+  if parent and parent ~= "" and vim.fn.isdirectory(parent) == 1 then
+    return expanded .. ".png"
   end
 
   return expanded .. sep .. path_utils.generate_snapshot_filename()

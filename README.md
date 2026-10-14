@@ -22,6 +22,8 @@
 - 🪟 **macOS Title Bar**: Displays macOS traffic lights and the current buffer's file name.
 - 📂 **Repo-Based Breadcrumbs**: Automatically displays relative paths based on your git repository root.
 - 📊 **Git Diff Support**: Highlights added (`+`) and deleted (`-`) lines when snapping diff content.
+- 🖼️ **Universal PNG Format Only**: Copies and saves strictly as PNG (`image/png`, `public.png`) — zero TIFF files or uncompressed bitmap issues in Slack, Discord, Chrome, or GitHub.
+- 📦 **Precompiled Native Binaries**: Bundled pre-built binaries for macOS (Apple Silicon & Intel) and Linux (x86_64). No Rust or Cargo installation required.
 - 🚀 **Optimized Native Engine**: Compiled with Rust release optimizations and Thin LTO for fast rendering.
 - 🚫 **No Watermarks**: Clean code card out of the box.
 
@@ -31,14 +33,18 @@
 
 CodeSnappier is engineered to eliminate UI blocking and deliver near-instantaneous snapshots:
 
-| Operation | Before | CodeSnappier | Speedup |
+| Operation | Upstream | CodeSnappier | Speedup |
 | :--- | :--- | :--- | :--- |
-| **Copy to Clipboard** (`:CodeSnappier`) | ~1,225 ms | **~42 ms** | **~29x faster** |
-| **Save to Disk** (`:CodeSnappierSave`) | ~180 ms | **~42 ms** | **~4.3x faster** |
-| **Clipboard Delivery** | ~1,185 ms (blocking) | **~1.5 ms** (detached) | **~790x faster** |
+| **Copy to Clipboard** (`:CodeSnappier`, ~10 lines) | ~1,225 ms | **~98 ms** | **~12x faster** |
+| **Save to Disk** (`:CodeSnappierSave`, ~10 lines) | ~180 ms | **~95 ms** | **~1.9x faster** |
+| **Clipboard Delivery Hand-off** | ~1,185 ms (blocking) | **~1.5 ms** (detached) | **~790x faster** |
+| **Image Format Compatibility** | `.tiff` (unsupported on web/chat) | **Pure PNG (`image/png`)** | **Universal** |
+| **Plugin Installation / Setup** | Requires Rust & `cargo build` | **Bundled Precompiled Binary** | **Instant** |
 
 ### Why is it faster?
 
+- **Bundled Precompiled Binaries**: Includes pre-built platform binaries directly in the plugin repository. Neovim automatically detects and loads the native engine on startup with zero compilation friction, zero Cargo downloads, and zero build waiting time.
+- **Pure PNG Clipboard Stream (No TIFF)**: Native macOS Cocoa `NSPasteboard` integration (`public.png`) and detached `wl-copy`/`xclip` (`image/png`) on Linux completely bypass `arboard`'s legacy TIFF encoding, delivering pure PNG images compatible with Slack, Discord, Chrome, GitHub, and desktop apps.
 - **Eliminated 1-Second Clipboard Sleep**: Removed an unconditional 1,000 ms block from upstream that froze Neovim's main thread on every copy.
 - **Direct In-Memory PNG Streaming**: Bypassed intermediate RGBA conversions, piping pre-encoded PNG bytes directly from native memory.
 - **Detached Asynchronous Delivery**: Offloaded clipboard handoff to background processes (`wl-copy` on Wayland, `xclip` on X11, native pasteboard on macOS/Windows) so Neovim never waits on external display servers.
@@ -51,10 +57,13 @@ CodeSnappier is engineered to eliminate UI blocking and deliver near-instantaneo
 
 ### [lazy.nvim](https://github.com/folke/lazy.nvim)
 
+> [!NOTE]
+> CodeSnappier includes precompiled native binaries for macOS (Apple Silicon & Intel) and Linux (x86_64). **No Rust toolchain (`cargo` or `rustc`) is required to use this plugin.**
+
 ```lua
 {
-  "Codesmith28/CodeSnappier.nvim", -- or local dir = "~/Projects/CodeSnappier.nvim" (or "~/Projects/codesnap.nvim")
-  build = "make build_generator",
+  "Codesmith28/CodeSnappier.nvim",
+  build = "make", -- copies precompiled binary (optional; auto-loads if omitted)
   cmd = { "CodeSnappier", "CodeSnappierSave", "CodeSnap", "CodeSnapSave" },
   keys = {
     { "<leader>Cc", "<cmd>CodeSnappier<cr>", mode = "x", desc = "Copy snapshot to clipboard" },
@@ -66,7 +75,9 @@ CodeSnappier is engineered to eliminate UI blocking and deliver near-instantaneo
 }
 ```
 
-### Build from source (manual)
+### Build from source (optional / developers)
+
+If you are modifying the Rust core or running an unsupported architecture, you can build from source manually:
 
 ```bash
 git clone https://github.com/Codesmith28/CodeSnappier.nvim.git ~/.local/share/nvim/lazy/CodeSnappier.nvim
@@ -80,8 +91,8 @@ make build_generator
 
 | Command | Alias | Keymap (Visual) | Description |
 | :--- | :--- | :--- | :--- |
-| `:CodeSnappier` | `:CodeSnap` | `<leader>Cc` | Copies snapshot to clipboard as transparent PNG (`image/png`). |
-| `:CodeSnappierSave [path]` | `:CodeSnapSave` | `<leader>Cs` | Saves snapshot to disk (defaults to system screenshot folder). |
+| `:CodeSnappier` | `:CodeSnap` | `<leader>Cc` | Copies snapshot to clipboard strictly as transparent PNG (`image/png`, `public.png`). |
+| `:CodeSnappierSave [path]` | `:CodeSnapSave` | `<leader>Cs` | Saves snapshot to disk strictly as PNG (defaults to system screenshot folder). |
 | `:CodeSnappierHighlight` | `:CodeSnapHighlight` | — | Interactively select lines to highlight before copying. |
 | `:CodeSnappierASCII` | `:CodeSnapASCII` | — | Copies snapshot as ASCII art text box. |
 

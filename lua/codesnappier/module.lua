@@ -20,11 +20,37 @@ function module.get_lib_extension()
   return extension or "so"
 end
 
+local function get_platform_info()
+  local uv = vim.uv or vim.loop
+  local uname = uv.os_uname()
+  local sys = uname.sysname:lower()
+  local arch = uname.machine:lower()
+
+  local os_name = "unknown"
+  if sys:find("darwin") or sys:find("mac") or jit.os:lower() == "osx" or jit.os:lower() == "mac" then
+    os_name = "mac"
+  elseif sys:find("linux") or jit.os:lower() == "linux" then
+    os_name = "linux"
+  elseif sys:find("windows") or jit.os:lower() == "windows" then
+    os_name = "windows"
+  end
+
+  local arch_name = "unknown"
+  if arch == "x86_64" or arch == "amd64" or jit.arch:lower() == "x64" then
+    arch_name = "x86_64"
+  elseif arch == "aarch64" or arch == "arm64" or jit.arch:lower() == "arm64" then
+    arch_name = "aarch64"
+  end
+
+  return os_name, arch_name
+end
+
 -- Get the path of the generator library
 function module.generator_file_path(is_debug)
   local plugin_root = vim.fn.fnamemodify(debug.getinfo(1).source:sub(2), ":p:h:h:h")
   local ext = module.get_lib_extension()
   local is_win = platform.is_windows()
+  local os_name, arch_name = get_platform_info()
 
   -- If explicitly requested debug mode, prioritize debug target
   local search_targets = {}
@@ -36,18 +62,29 @@ function module.generator_file_path(is_debug)
     )
   end
 
-  -- Search local build targets first:
-  -- 1. lua/generator.so
-  -- 2. generator/target/release/libgenerator.so
-  -- 3. generator/target/debug/libgenerator.so
-  table.insert(search_targets, path_utils.join(sep, plugin_root, "lua", "generator.so"))
+  -- 1. Standard active binary: lua/generator.so, generator.dylib, generator.dll
+  local default_target = path_utils.join(sep, plugin_root, "lua", "generator.so")
+  table.insert(search_targets, default_target)
   table.insert(search_targets, path_utils.join(sep, plugin_root, "lua", "generator." .. ext))
   table.insert(search_targets, path_utils.join(sep, plugin_root, "lua", "libgenerator." .. ext))
+
+  -- 2. Bundled precompiled binaries for current OS/architecture
+  if os_name ~= "unknown" and arch_name ~= "unknown" then
+    local platform_id = string.format("%s-%s", os_name, arch_name)
+    table.insert(search_targets, path_utils.join(sep, plugin_root, "lua", platform_id .. "generator.so"))
+    table.insert(search_targets, path_utils.join(sep, plugin_root, "lua", platform_id .. "_generator.so"))
+    table.insert(search_targets, path_utils.join(sep, plugin_root, "lua", platform_id .. "generator." .. ext))
+    table.insert(search_targets, path_utils.join(sep, plugin_root, "lua", platform_id .. "_generator." .. ext))
+  end
+
+  -- 3. Local cargo release builds
   table.insert(search_targets, path_utils.join(sep, plugin_root, "generator", "target", "release", "libgenerator.so"))
   table.insert(
     search_targets,
     path_utils.join(sep, plugin_root, "generator", "target", "release", (is_win and "generator." or "libgenerator.") .. ext)
   )
+
+  -- 4. Local cargo debug builds
   table.insert(search_targets, path_utils.join(sep, plugin_root, "generator", "target", "debug", "libgenerator.so"))
   table.insert(
     search_targets,
@@ -58,6 +95,10 @@ function module.generator_file_path(is_debug)
     if vim.fn.filereadable(candidate) == 1 then
       local loader = package.loadlib(candidate, "luaopen_generator")
       if loader then
+        -- If loaded from bundled precompiled binary, auto-populate lua/generator.so if missing
+        if candidate ~= default_target and vim.fn.filereadable(default_target) == 0 then
+          pcall(vim.fn.system, string.format("cp -f %s %s", vim.fn.shellescape(candidate), vim.fn.shellescape(default_target)))
+        end
         return candidate
       end
     end

@@ -53,7 +53,7 @@ local function get_plugin_version()
 end
 
 local function download_lib(version, lib_name, dest_path)
-  local url = string.format("https://github.com/mistricky/codesnap.nvim/releases/download/v%s/%s", version, lib_name)
+  local url = string.format("https://github.com/Codesmith28/CodeSnappier.nvim/releases/download/v%s/%s", version, lib_name)
   local platform_utils = require("codesnappier.utils.platform")
 
   local cmd
