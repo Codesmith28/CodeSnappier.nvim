@@ -5,6 +5,7 @@
 
 # Cargo
 target
+generator/target
 
 # Nodejs 
 node_modules
@@ -20,7 +21,10 @@ node_modules
 # build
 output.css
 *.so
-!lua/*-aarch64*generator.so
-!lua/*-x86_64*generator.so
+*.dylib
+*.dll
 lua/generator.so
-lua/libs
+lua/generator.dylib
+lua/generator.dll
+lua/libs/
+libs/
