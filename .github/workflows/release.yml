@@ -28,6 +28,6 @@ jobs:
         uses: ncipollo/release-action@v1
         with:
           name: Release ${{ github.ref_name }}
-          token: ${{ secrets.PAT }}
+          token: ${{ secrets.PAT || secrets.GITHUB_TOKEN }}
           generateReleaseNotes: true
           prerelease: ${{ env.is_prerelease }}
