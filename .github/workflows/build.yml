@@ -2,11 +2,13 @@ name: Build & Release Precompiled Binaries
 
 on:
   push:
-    branches: [ main ]
-    tags: [ 'v*' ]
-  pull_request:
-    branches: [ main ]
+    tags:
+      - 'v*'
   workflow_dispatch:
+
+concurrency:
+  group: build-${{ github.ref }}
+  cancel-in-progress: true
 
 jobs:
   build:
@@ -40,18 +42,6 @@ jobs:
             origin_dylib_suffix: dylib
             dest_dylib_suffix: so
 
-          - os_name: windows-x86_64
-            os: windows-latest
-            target: x86_64-pc-windows-msvc
-            origin_dylib_suffix: dll
-            dest_dylib_suffix: dll
-
-          - os_name: windows-aarch64
-            os: windows-latest
-            target: aarch64-pc-windows-msvc
-            origin_dylib_suffix: dll
-            dest_dylib_suffix: dll
-
         toolchain:
           - stable
     steps:
@@ -62,12 +52,6 @@ jobs:
         run: |
           sudo apt-get update
           sudo apt-get install -y make perl pkg-config libssl-dev
-
-      - name: Setup MSVC developer command prompt
-        if: runner.os == 'Windows'
-        uses: ilammy/msvc-dev-cmd@v1
-        with:
-          arch: ${{ matrix.platform.os_name == 'windows-aarch64' && 'x64_arm64' || 'x64' }}
 
       - name: Install Rust toolchain
         uses: dtolnay/rust-toolchain@stable
@@ -99,11 +83,7 @@ jobs:
         shell: bash
         run: |
           mkdir -p dist
-          if [ "${{ runner.os }}" = "Windows" ]; then
-            src_lib="generator/target/${{ matrix.platform.target }}/release/generator.dll"
-          else
-            src_lib="generator/target/${{ matrix.platform.target }}/release/libgenerator.${{ matrix.platform.origin_dylib_suffix }}"
-          fi
+          src_lib="generator/target/${{ matrix.platform.target }}/release/libgenerator.${{ matrix.platform.origin_dylib_suffix }}"
           cp -rf "$src_lib" "dist/${{ matrix.platform.os_name }}_generator.${{ matrix.platform.dest_dylib_suffix }}"
 
       - name: Upload artifact
@@ -115,7 +95,7 @@ jobs:
   upload-to-release:
     name: Upload to GitHub Release
     needs: build
-    if: always() && !cancelled() && (github.event_name == 'release' || startsWith(github.ref, 'refs/tags/') || github.ref == 'refs/heads/main')
+    if: always() && !cancelled() && (github.event_name == 'release' || startsWith(github.ref, 'refs/tags/'))
     runs-on: ubuntu-latest
     permissions:
       contents: write

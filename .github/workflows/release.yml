@@ -5,6 +5,10 @@ on:
     tags:
       - "v*"
 
+concurrency:
+  group: release-${{ github.ref }}
+  cancel-in-progress: true
+
 permissions:
   contents: write
 
@@ -31,3 +35,4 @@ jobs:
           token: ${{ secrets.PAT || secrets.GITHUB_TOKEN }}
           generateReleaseNotes: true
           prerelease: ${{ env.is_prerelease }}
+          allowUpdates: true

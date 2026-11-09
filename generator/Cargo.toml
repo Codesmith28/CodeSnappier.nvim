@@ -19,9 +19,6 @@ cosmic-text = { version = "0.14", default-features = false }
 [target.'cfg(target_os = "macos")'.dependencies]
 objc2 = "0.6"
 
-[target.'cfg(windows)'.dependencies]
-mlua = { version = "0.10.0", features = ["vendored"] }
-
 [profile.release]
 opt-level = 3
 lto = "thin"
