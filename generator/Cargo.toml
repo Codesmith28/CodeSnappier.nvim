@@ -11,8 +11,8 @@ codesnap = { version = "0.13.4", features = ["full"] }
 mlua = { version = "0.10.0", features = ["module", "luajit", "serialize"] }
 serde = { version = "1.0.204", features = ["derive"] }
 tokio = { version = "1.44.2", features = ["rt", "rt-multi-thread"] }
-# Use system OpenSSL
-openssl = { version = "0.10" }
+# Statically vendor OpenSSL for Linux and Windows builds
+openssl = { version = "0.10", features = ["vendored"] }
 arboard = { version = "3.6", default-features = false, features = ["image-data"] }
 cosmic-text = { version = "0.14", default-features = false }
 

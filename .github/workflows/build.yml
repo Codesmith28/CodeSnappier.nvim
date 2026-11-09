@@ -34,7 +34,7 @@ jobs:
             dest_dylib_suffix: so
 
           - os_name: mac-x86_64
-            os: macOS-13
+            os: macOS-latest
             target: x86_64-apple-darwin
             origin_dylib_suffix: dylib
             dest_dylib_suffix: so
@@ -62,7 +62,13 @@ jobs:
           sudo apt-get update
           sudo apt-get install -y make perl pkg-config libssl-dev
 
-      - name: Build link lib
+      - name: Install Rust toolchain
+        uses: dtolnay/rust-toolchain@stable
+        with:
+          targets: ${{ matrix.platform.target }}
+
+      - name: Build link lib (cross)
+        if: matrix.platform.target == 'aarch64-unknown-linux-gnu'
         uses: houseabsolute/actions-rust-cross@v0
         with:
           command: "build"
@@ -70,6 +76,13 @@ jobs:
           target: ${{ matrix.platform.target }}
           toolchain: ${{ matrix.toolchain }}
           args: "--release"
+
+      - name: Build link lib (native / host)
+        if: matrix.platform.target != 'aarch64-unknown-linux-gnu'
+        shell: bash
+        run: |
+          cd generator
+          cargo build --release --target ${{ matrix.platform.target }}
 
       - name: List files
         shell: bash
@@ -92,6 +105,7 @@ jobs:
   upload-to-release:
     name: Upload to GitHub Release
     needs: build
+    if: always() && !cancelled() && (github.event_name == 'release' || startsWith(github.ref, 'refs/tags/') || github.ref == 'refs/heads/main')
     runs-on: ubuntu-latest
     permissions:
       contents: write
@@ -101,7 +115,18 @@ jobs:
         with:
           path: artifacts
 
+      - name: Check artifacts
+        id: check_artifacts
+        shell: bash
+        run: |
+          if [ -d artifacts ] && [ -n "$(find artifacts -type f 2>/dev/null)" ]; then
+            echo "found=true" >> $GITHUB_OUTPUT
+          else
+            echo "found=false" >> $GITHUB_OUTPUT
+          fi
+
       - name: Upload to release
+        if: steps.check_artifacts.outputs.found == 'true'
         uses: softprops/action-gh-release@v1
         with:
           tag_name: ${{ github.event.release.tag_name || (startsWith(github.ref, 'refs/tags/') && github.ref_name) || 'v2.1.1' }}
