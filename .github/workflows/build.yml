@@ -45,12 +45,6 @@ jobs:
             origin_dylib_suffix: dylib
             dest_dylib_suffix: so
 
-          - os_name: windows-x86_64
-            os: windows-latest
-            target: x86_64-pc-windows-msvc
-            origin_dylib_suffix: dll
-            dest_dylib_suffix: dll
-
         toolchain:
           - stable
     steps:
