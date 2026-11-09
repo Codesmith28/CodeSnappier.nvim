@@ -58,7 +58,14 @@ function module.generator_file_path(is_debug)
     table.insert(search_targets, path_utils.join(sep, plugin_root, "generator", "target", "debug", "libgenerator.so"))
     table.insert(
       search_targets,
-      path_utils.join(sep, plugin_root, "generator", "target", "debug", (is_win and "generator." or "libgenerator.") .. ext)
+      path_utils.join(
+        sep,
+        plugin_root,
+        "generator",
+        "target",
+        "debug",
+        (is_win and "generator." or "libgenerator.") .. ext
+      )
     )
   end
 
@@ -77,14 +84,28 @@ function module.generator_file_path(is_debug)
   table.insert(search_targets, path_utils.join(sep, plugin_root, "generator", "target", "release", "libgenerator.so"))
   table.insert(
     search_targets,
-    path_utils.join(sep, plugin_root, "generator", "target", "release", (is_win and "generator." or "libgenerator.") .. ext)
+    path_utils.join(
+      sep,
+      plugin_root,
+      "generator",
+      "target",
+      "release",
+      (is_win and "generator." or "libgenerator.") .. ext
+    )
   )
 
   -- 4. Local cargo debug builds
   table.insert(search_targets, path_utils.join(sep, plugin_root, "generator", "target", "debug", "libgenerator.so"))
   table.insert(
     search_targets,
-    path_utils.join(sep, plugin_root, "generator", "target", "debug", (is_win and "generator." or "libgenerator.") .. ext)
+    path_utils.join(
+      sep,
+      plugin_root,
+      "generator",
+      "target",
+      "debug",
+      (is_win and "generator." or "libgenerator.") .. ext
+    )
   )
 
   -- 5. Bundled binaries (if present)
@@ -111,7 +132,10 @@ function module.generator_file_path(is_debug)
     local loader = package.loadlib(lib_path, "luaopen_generator")
     if loader then
       -- Copy to default target for faster subsequent loads
-      pcall(vim.fn.system, string.format("cp -f %s %s", vim.fn.shellescape(lib_path), vim.fn.shellescape(default_target)))
+      pcall(
+        vim.fn.system,
+        string.format("cp -f %s %s", vim.fn.shellescape(lib_path), vim.fn.shellescape(default_target))
+      )
       return lib_path
     end
   end

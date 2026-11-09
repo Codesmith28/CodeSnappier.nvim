@@ -101,7 +101,12 @@ function path_utils.get_breadcrumbs(show_workspace)
   local git_root = path_utils.get_git_root()
   if git_root then
     local rel_path = vim.fs.relpath(git_root, full_path) or full_path
-    if show_workspace and not rel_path:match("^[/\\]") and not rel_path:match("^%a:[/\\]") and not rel_path:match("^%.%.") then
+    if
+      show_workspace
+      and not rel_path:match("^[/\\]")
+      and not rel_path:match("^%a:[/\\]")
+      and not rel_path:match("^%.%.")
+    then
       local repo_name = vim.fs.basename(git_root)
       return (repo_name and repo_name ~= "" and (repo_name .. "/") or "") .. rel_path
     else
@@ -111,7 +116,12 @@ function path_utils.get_breadcrumbs(show_workspace)
 
   local cwd = vim.fn.getcwd()
   local rel_path = vim.fs.relpath(cwd, full_path) or vim.fn.fnamemodify(full_path, ":.")
-  if show_workspace and not rel_path:match("^[/\\]") and not rel_path:match("^%a:[/\\]") and not rel_path:match("^%.%.") then
+  if
+    show_workspace
+    and not rel_path:match("^[/\\]")
+    and not rel_path:match("^%a:[/\\]")
+    and not rel_path:match("^%.%.")
+  then
     local workspace = vim.fs.basename(cwd)
     return (workspace and workspace ~= "" and (workspace .. "/") or "") .. rel_path
   else
@@ -180,7 +190,12 @@ end
 function path_utils.resolve_save_path(save_path)
   if not save_path or save_path == "" then
     local ok, static = pcall(require, "codesnappier.static")
-    local configured_path = ok and static and (static.config and static.config.save_path or (static.config and static.config.snapshot_config and static.config.snapshot_config.save_path))
+    local configured_path = ok
+      and static
+      and (
+        static.config and static.config.save_path
+        or (static.config and static.config.snapshot_config and static.config.snapshot_config.save_path)
+      )
     save_path = configured_path or path_utils.get_default_save_path()
   end
 

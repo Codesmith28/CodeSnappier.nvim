@@ -1,6 +1,12 @@
 name: Lint
 
-on: push
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+    branches:
+      - main
 
 jobs:
   lint:
@@ -11,21 +17,12 @@ jobs:
         with:
           fetch-depth: 0
 
-
-      - name: Setup nodejs
-        uses: actions/setup-node@v4
-        with:
-          node-version: latest
-
-      - name: Install commit message convention lib
-        run: npm i commitlint-config-wizardoc -D
-
       - name: Check commit message
-        uses: wagoid/commitlint-github-action@v4
+        uses: wagoid/commitlint-github-action@v6
 
       - name: Check code style
         uses: JohnnyMorganz/stylua-action@v4
         with:
           token: ${{ secrets.GITHUB_TOKEN }}
-          version: latest 
+          version: latest
           args: --check .

@@ -156,8 +156,8 @@ local function detect_terminal_font()
       local f = io.open(path, "r")
       if f then
         for line in f:lines() do
-          local font = line:match('family%s*=%s*["\']([^"\']+)["\']')
-            or line:match('family:%s*["\']?([^"\'\r\n]+)["\']?')
+          local font = line:match("family%s*=%s*[\"']([^\"']+)[\"']")
+            or line:match("family:%s*[\"']?([^\"'\r\n]+)[\"']?")
           if font and font ~= "" and font:lower() ~= "monospace" then
             f:close()
             return normalize_font_name(font)
@@ -176,8 +176,8 @@ local function detect_terminal_font()
       if f then
         local content = f:read("*a")
         f:close()
-        local font = content:match('font%s*=%s*wezterm%.font%s*%(%s*["\']([^"\']+)["\']')
-          or content:match('font%s*=%s*wezterm%.font_with_fallback%s*%({?%s*["\']([^"\']+)["\']')
+        local font = content:match("font%s*=%s*wezterm%.font%s*%(%s*[\"']([^\"']+)[\"']")
+          or content:match("font%s*=%s*wezterm%.font_with_fallback%s*%({?%s*[\"']([^\"']+)[\"']")
         if font and font ~= "" and font:lower() ~= "monospace" then
           return normalize_font_name(font)
         end

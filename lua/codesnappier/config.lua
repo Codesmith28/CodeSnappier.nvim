@@ -98,7 +98,8 @@ function config_module.get_config(detail)
   local highlight_lines = {}
   if is_diff then
     local add_color = (static.config.diff_config and static.config.diff_config.add_color) or theme_info.diff_add
-    local delete_color = (static.config.diff_config and static.config.diff_config.delete_color) or theme_info.diff_delete
+    local delete_color = (static.config.diff_config and static.config.diff_config.delete_color)
+      or theme_info.diff_delete
     highlight_lines = generate_diff_highlights(lines, add_color, delete_color, is_strict_diff)
   end
 
@@ -121,7 +122,11 @@ function config_module.get_config(detail)
   -- Resolve font: User explicit config -> p0 (terminal) -> p1 (system) -> p2 (fallback)
   local explicit_font = static.config.font_family
     or (static.config.snapshot_config and static.config.snapshot_config.font_family)
-    or (static.config.snapshot_config and static.config.snapshot_config.code_config and static.config.snapshot_config.code_config.font_family)
+    or (
+      static.config.snapshot_config
+      and static.config.snapshot_config.code_config
+      and static.config.snapshot_config.code_config.font_family
+    )
 
   local resolved_font
   if explicit_font and explicit_font ~= "" and explicit_font ~= "auto" then
@@ -140,11 +145,13 @@ function config_module.get_config(detail)
   if snapshot_config.code_config then
     snapshot_config.code_config.font_family = resolved_font
     if snapshot_config.code_config.breadcrumbs then
-      snapshot_config.code_config.breadcrumbs.font_family = snapshot_config.code_config.breadcrumbs.font_family or resolved_font
+      snapshot_config.code_config.breadcrumbs.font_family = snapshot_config.code_config.breadcrumbs.font_family
+        or resolved_font
     end
   end
   if snapshot_config.command_output_config then
-    snapshot_config.command_output_config.font_family = snapshot_config.command_output_config.font_family or resolved_font
+    snapshot_config.command_output_config.font_family = snapshot_config.command_output_config.font_family
+      or resolved_font
   end
   if snapshot_config.watermark then
     snapshot_config.watermark.font_family = snapshot_config.watermark.font_family or resolved_font

@@ -81,7 +81,8 @@ end
 --- @param detail_or_path any
 --- @param maybe_detail table|nil
 function main.copy(detail_or_path, maybe_detail)
-  local detail = type(detail_or_path) == "table" and detail_or_path or (type(maybe_detail) == "table" and maybe_detail or nil)
+  local detail = type(detail_or_path) == "table" and detail_or_path
+    or (type(maybe_detail) == "table" and maybe_detail or nil)
   local config = config_module.get_config(detail)
   copy_snapshot_image(config)
   pcall(vim.cmd, "delmarks <>")
@@ -92,7 +93,8 @@ end
 --- @param detail_or_path any
 --- @param maybe_detail table|nil
 function main.copy_ascii(detail_or_path, maybe_detail)
-  local detail = type(detail_or_path) == "table" and detail_or_path or (type(maybe_detail) == "table" and maybe_detail or nil)
+  local detail = type(detail_or_path) == "table" and detail_or_path
+    or (type(maybe_detail) == "table" and maybe_detail or nil)
   local config = config_module.get_config(detail)
   generator.copy_ascii(config)
   pcall(vim.cmd, "delmarks <>")
@@ -102,7 +104,8 @@ end
 --- @param detail_or_path any
 --- @param maybe_detail table|nil
 function main.copy_highlight(detail_or_path, maybe_detail)
-  local detail = type(detail_or_path) == "table" and detail_or_path or (type(maybe_detail) == "table" and maybe_detail or nil)
+  local detail = type(detail_or_path) == "table" and detail_or_path
+    or (type(maybe_detail) == "table" and maybe_detail or nil)
   local original_config = config_module.get_config(detail)
   if not original_config or not original_config.content or not original_config.content.content then
     vim.notify("No code is selected", vim.log.levels.ERROR)

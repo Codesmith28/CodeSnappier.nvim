@@ -68,7 +68,8 @@ function theme.extract()
 
   local font_style_tag = comment_italic and "\n\t\t\t\t<key>fontStyle</key>\n\t\t\t\t<string>italic</string>" or ""
 
-  local xml_content = string.format([[<?xml version="1.0" encoding="UTF-8"?>
+  local xml_content = string.format(
+    [[<?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
 <plist version="1.0">
 <dict>

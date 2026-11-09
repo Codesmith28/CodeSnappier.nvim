@@ -27,13 +27,33 @@ end
 -- Primary CodeSnappier commands
 vim.api.nvim_create_user_command("CodeSnappierSave", take_snapshot(codesnappier.save), { nargs = "*", range = "%" })
 vim.api.nvim_create_user_command("CodeSnappier", take_snapshot(codesnappier.copy), { nargs = "*", range = "%" })
-vim.api.nvim_create_user_command("CodeSnappierASCII", take_snapshot(codesnappier.copy_ascii), { nargs = "*", range = "%" })
-vim.api.nvim_create_user_command("CodeSnappierHighlight", take_snapshot(codesnappier.copy_highlight), { nargs = "*", range = "%" })
-vim.api.nvim_create_user_command("CodeSnappierHighlightSave", take_snapshot(codesnappier.save_highlight), { nargs = "*", range = "%" })
+vim.api.nvim_create_user_command(
+  "CodeSnappierASCII",
+  take_snapshot(codesnappier.copy_ascii),
+  { nargs = "*", range = "%" }
+)
+vim.api.nvim_create_user_command(
+  "CodeSnappierHighlight",
+  take_snapshot(codesnappier.copy_highlight),
+  { nargs = "*", range = "%" }
+)
+vim.api.nvim_create_user_command(
+  "CodeSnappierHighlightSave",
+  take_snapshot(codesnappier.save_highlight),
+  { nargs = "*", range = "%" }
+)
 
 -- Backward compatibility aliases
 vim.api.nvim_create_user_command("CodeSnapSave", take_snapshot(codesnappier.save), { nargs = "*", range = "%" })
 vim.api.nvim_create_user_command("CodeSnap", take_snapshot(codesnappier.copy), { nargs = "*", range = "%" })
 vim.api.nvim_create_user_command("CodeSnapASCII", take_snapshot(codesnappier.copy_ascii), { nargs = "*", range = "%" })
-vim.api.nvim_create_user_command("CodeSnapHighlight", take_snapshot(codesnappier.copy_highlight), { nargs = "*", range = "%" })
-vim.api.nvim_create_user_command("CodeSnapHighlightSave", take_snapshot(codesnappier.save_highlight), { nargs = "*", range = "%" })
+vim.api.nvim_create_user_command(
+  "CodeSnapHighlight",
+  take_snapshot(codesnappier.copy_highlight),
+  { nargs = "*", range = "%" }
+)
+vim.api.nvim_create_user_command(
+  "CodeSnapHighlightSave",
+  take_snapshot(codesnappier.save_highlight),
+  { nargs = "*", range = "%" }
+)
