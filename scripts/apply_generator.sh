@@ -26,10 +26,14 @@ function apply_generator {
   done
 
   # Attempt to pre-fetch latest release binary via curl if network is available
-  local dl_url="https://github.com/Codesmith28/CodeSnappier.nvim/releases/latest/download/${target_os}_generator.so"
+  local ext="so"
+  if [[ "$target_os" =~ "windows" ]]; then
+    ext="dll"
+  fi
+  local dl_url="https://github.com/Codesmith28/CodeSnappier.nvim/releases/latest/download/${target_os}_generator.${ext}"
   mkdir -p "$REPO_ROOT/lua/libs"
-  if curl -f -L -s -o "$REPO_ROOT/lua/libs/${target_os}_generator.so" "$dl_url" 2>/dev/null && [ -s "$REPO_ROOT/lua/libs/${target_os}_generator.so" ]; then
-    cp -rf "$REPO_ROOT/lua/libs/${target_os}_generator.so" "$REPO_ROOT/lua/generator.so"
+  if curl -f -L -s -o "$REPO_ROOT/lua/libs/${target_os}_generator.${ext}" "$dl_url" 2>/dev/null && [ -s "$REPO_ROOT/lua/libs/${target_os}_generator.${ext}" ]; then
+    cp -rf "$REPO_ROOT/lua/libs/${target_os}_generator.${ext}" "$REPO_ROOT/lua/generator.${ext}"
     echo "Downloaded and applied precompiled binary for $target_os."
     return 0
   fi

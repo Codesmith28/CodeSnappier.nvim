@@ -2,16 +2,11 @@ name: Build & Release Precompiled Binaries
 
 on:
   push:
-    branches:
-      - main
-    tags:
-      - "v*"
+    branches: [ main ]
+    tags: [ 'v*' ]
+  pull_request:
+    branches: [ main ]
   workflow_dispatch:
-  release:
-    types: [published]
-
-permissions:
-  contents: write
 
 jobs:
   build:
@@ -45,16 +40,34 @@ jobs:
             origin_dylib_suffix: dylib
             dest_dylib_suffix: so
 
+          - os_name: windows-x86_64
+            os: windows-latest
+            target: x86_64-pc-windows-msvc
+            origin_dylib_suffix: dll
+            dest_dylib_suffix: dll
+
+          - os_name: windows-aarch64
+            os: windows-latest
+            target: aarch64-pc-windows-msvc
+            origin_dylib_suffix: dll
+            dest_dylib_suffix: dll
+
         toolchain:
           - stable
     steps:
       - uses: actions/checkout@v4
 
       - name: Install dependencies for vendored builds
-        if: contains(matrix.platform.target, 'linux')
+        if: runner.os == 'Linux'
         run: |
           sudo apt-get update
           sudo apt-get install -y make perl pkg-config libssl-dev
+
+      - name: Setup MSVC developer command prompt
+        if: runner.os == 'Windows'
+        uses: ilammy/msvc-dev-cmd@v1
+        with:
+          arch: ${{ matrix.platform.os_name == 'windows-aarch64' && 'x64_arm64' || 'x64' }}
 
       - name: Install Rust toolchain
         uses: dtolnay/rust-toolchain@stable
@@ -86,9 +99,12 @@ jobs:
         shell: bash
         run: |
           mkdir -p dist
-          src_lib="generator/target/${{ matrix.platform.target }}/release/${{ startsWith(matrix.platform.target, 'x86_64-pc-windows-msvc') && 'generator' || 'libgenerator' }}.${{ matrix.platform.origin_dylib_suffix }}"
+          if [ "${{ runner.os }}" = "Windows" ]; then
+            src_lib="generator/target/${{ matrix.platform.target }}/release/generator.dll"
+          else
+            src_lib="generator/target/${{ matrix.platform.target }}/release/libgenerator.${{ matrix.platform.origin_dylib_suffix }}"
+          fi
           cp -rf "$src_lib" "dist/${{ matrix.platform.os_name }}_generator.${{ matrix.platform.dest_dylib_suffix }}"
-          cp -rf "$src_lib" "dist/${{ matrix.platform.os_name }}generator.${{ matrix.platform.dest_dylib_suffix }}"
 
       - name: Upload artifact
         uses: actions/upload-artifact@v4
@@ -118,6 +134,23 @@ jobs:
           else
             echo "found=false" >> $GITHUB_OUTPUT
           fi
+
+      - name: Clean up duplicate and stale assets
+        shell: bash
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          target_tag="${{ github.event.release.tag_name || (startsWith(github.ref, 'refs/tags/') && github.ref_name) || 'v2.1.1' }}"
+          echo "Cleaning stale/duplicate assets for tag $target_tag..."
+          for stale_name in \
+            linux-x86_64generator.so \
+            linux-aarch64generator.so \
+            mac-x86_64generator.so \
+            mac-aarch64generator.so \
+            windows-x86_64generator.dll \
+            windows-aarch64generator.dll; do
+            gh release delete-asset "$target_tag" "$stale_name" -y 2>/dev/null || true
+          done
 
       - name: Upload to release
         if: steps.check_artifacts.outputs.found == 'true'

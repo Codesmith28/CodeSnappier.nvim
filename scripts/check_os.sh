@@ -18,7 +18,10 @@ case "$uname_output" in
     esac
     ;;
   CYGWIN*|MINGW*|MSYS*)
-    os="windows-x86_64"
+    case "$uname_m_output" in
+      aarch64|arm64) os="windows-aarch64" ;;
+      *)             os="windows-x86_64" ;;
+    esac
     ;;
   *)
     echo "Unknown platform: $uname_output"
